@@ -1,0 +1,5 @@
+* Develop scale clock that can run at any arbitrary rate relative to real-time.
+* Find out what goes wrong at midnight and fix it.
+* Load polylines via AJAX
+* Do we really need the mask? Can it be eliminated entirely?
+* Does the length column for paths do anything? Can it be eliminated?
