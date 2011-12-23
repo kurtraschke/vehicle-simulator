@@ -6,7 +6,7 @@ html, body {
 }
 
 body {
-  font-family: verdana, sans-serif;
+  font-family: "Alte Haas Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 18px;
 }
@@ -23,12 +23,17 @@ body {
 /* SIMULATION PANEL */
 #panel {
     position: absolute;
-    width: 300px;
+    width: 320px;
     padding: 5px;
     right: 70px;
     top: 70px;
     background-color: #FAFAFA;
     border: 1px solid #717D7D;
+    opacity: 0.85;
+}
+
+#panel div:first-child > p:hover {
+    cursor: move;
 }
 
 #panel > div {
@@ -44,7 +49,7 @@ body {
 #panel p {
     font-size: 20px;
     font-weight: bold;
-    font-family: Georgia, Helvetica
+    #font-family: Georgia, Helvetica
 }
 
 #geolocation_click {
@@ -77,6 +82,11 @@ input.panel_close {
     margin-bottom: 6px;
 }
 
+#vehicle_timetable_box {
+    height: 250px;
+    overflow-y: auto;
+}
+
 #vehicle_timetable {
     width: 275px;
 }
@@ -96,7 +106,7 @@ input.panel_close {
 
 #vehicle_timetable tbody tr.passed td, 
 #vehicle_timetable tbody tr.passed td a {
-    color: #CACACA;
+    color: #888;
 }
 
 #panel b {

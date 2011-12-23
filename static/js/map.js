@@ -1,13 +1,13 @@
 /*global $, google, simcity_topology_edges, InfoBox */
 var simulation_manager = (function(){
     var params = {
-        center_start: new google.maps.LatLng(47.378, 8.540),
+        center_start: new google.maps.LatLng(40.75773, -73.985708),
         zoom_start: 13,
         zoom_follow: 17,
         zoom_station: 15,
-        ft_id_mask: '812706',
-        ft_id_lines: '1497331',
-        ft_id_stations: '1497361'
+        ft_id_mask: '2474478',
+        ft_id_lines: '2475282',
+        ft_id_stations: '2475281'
     };
     
     var map = null;
@@ -416,7 +416,8 @@ $(document).ready(function(){
                 zoomControl: true,
                 scaleControl: true,
                 streetViewControl: true,
-                overviewMapControl: true
+                overviewMapControl: true,
+                scrollwheel: false
             });
             
             map.setOptions({
@@ -514,8 +515,9 @@ $(document).ready(function(){
                 if (track_vehicle_name === null) {
                     return false;
                 }
-                
+              
                 name = name.replace(/[^A-Z0-9]/i, '');
+
                 if (track_vehicle_name !== name) {
                     return false;
                 }
@@ -606,7 +608,7 @@ $(document).ready(function(){
             this.depS           = params.deps;
             this.arrS           = params.arrs;
             this.multiple_days  = has_multiple_days;
-            
+                      
             var html_rows = [];
             $.each(params.edges, function(index, edges) {
                 var s_dep = (typeof params.deps[index] === 'undefined') ? 24 * 3600 : params.deps[index];
@@ -684,7 +686,7 @@ $(document).ready(function(){
                 vehicle_ib.set('vehicle_id', null);
                 vehicle_ib.close();
             });
-            
+
             if (vehicleFollower.matchByName(params.name)) {
                 vehicle_clickHandler();
                 vehicleFollower.toggle(false);
@@ -713,11 +715,11 @@ $(document).ready(function(){
                                 var speed = linesPool.lengthGet(station_a, station_b) * 0.001 * 3600 / (that.arrS[i] - that.depS[i]);
                                 that.marker.set('speed', parseInt(speed, 10));
                                 
-                                that.marker.set('status', 'Heading to ' + stationsPool.get(station_b) + '(' + time_helpers.s2hm(that.arrS[i]) + ') with ' + that.marker.get('speed') + ' km/h');
+                                that.marker.set('status', 'Travelling to ' + stationsPool.get(station_b) + ' at ' + that.marker.get('speed') + ' km/h (' + Math.round(that.marker.get('speed') * 0.6213) + ' MPH), arriving at ' + time_helpers.s2hm(that.arrS[i]));
                             }
                             
                             var route_percent = (hms - that.depS[i])/(that.arrS[i] - that.depS[i]);
-
+                                                  
                             pos = linesPool.positionGet(station_a, station_b, route_percent);
                             if (pos === null) {
                                 console.log('Couldn\'t get the position of ' + that.id + ' between stations: ' + [station_a, station_b]);
@@ -777,7 +779,7 @@ $(document).ready(function(){
             get: function() {
                 $.ajax({
                     // Replace this with your vehicles API URL
-                    url: 'api/vehicles/' + timer.getHM() + '.json',
+                    url: 'api/vehicles/trains.json',
                     dataType: 'json',
                     success: function(vehicles) {
                         $.each(vehicles, function(index, data) {
@@ -798,6 +800,18 @@ $(document).ready(function(){
     simulation_manager.subscribe('map_init', function(){
         vehicle_helpers.get();
         setInterval(vehicle_helpers.get, 5*60*1000);
+                                   
+        var updateBox = function(){
+          var hms = timer.getTime();
+            $('#vehicle_timetable tbody tr').each(function(){
+                if ($(this).attr('data-dep-sec') < hms) {
+                  $(this).addClass('passed', 3000);
+                  }
+            });
+          };
+                                   
+        setInterval(updateBox, 1000);
+                                   
     });
     
     $.ajax({
@@ -810,6 +824,7 @@ $(document).ready(function(){
         }
     });
     
-    timer.init('09:00:00');
+    timer.init('08:00:00');
     map_helpers.init();
+    $('#panel').draggable({'handle': 'div:first-child > p', 'containment': 'document'});
 });
