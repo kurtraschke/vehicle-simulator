@@ -1,0 +1,13 @@
+This is an adaptation of Vasile Cotovanu's vehicle simulator to ATS data released by MTA NYCT.  The demo dataset contains trains active on May 31, 2011, between 8:00 AM and 8:30 AM.
+
+The following queries have been run on the ATS data to pre-process it:
+
+update trainevents set stopID=127 where stopID = 902 and routeID in (2, 3);
+update trainevents set routeID='GS' where routeID = 'NA';
+
+As ever, there's no ATS data in the un-resignalled parts of the Bronx.  Northbound trains are tracked relatively accurately (albeit with the intermediate stops missing), but southbound trains will appear to originate from E. 180 St station, regardless of their actual northern terminal.  The ATS data does contain the proper northern terminal for these trains, but after the departure event from the real northern terminal, the next event is another departure event.  In order for the simulator to work properly, events must strictly alternate between departures and arrivals.
+
+The frontend is mostly unchanged from Vasile Cotovanu's codebase for the SBB simulator, with the following major changes:
+* Make infobox slightly transparent and draggable, using jQuery UI
+* Dim stations in the infobox after the train has departed automatically (otherwise the box would have to be manually refreshed)
+* Add speed in MPH in train tooltip (the speeds are, of course, only an estimate)
