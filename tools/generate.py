@@ -1,10 +1,12 @@
 from datetime import date, datetime
 from itertools import izip_longest
+from collections import OrderedDict
 
 import json
 
 from sqlalchemy import create_engine, distinct, not_, and_
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 
 from gtfs import Schedule
 from gtfs.entity import Stop, Route
@@ -67,10 +69,7 @@ def pathbetween(origin, destination):
     paths[(origin, destination)] = {'points': points, 'id': str(pathid)}
     return paths[(origin, destination)]['id']
 
-
-blacklist = ['03 1225  148/NLT', '04 2327+ NLT/WDL', 'E4 1541  MOT/WDL']
 trains = [t for (t,) in session.query(TrainEvent.trainID)
-                               #.filter(not_(TrainEvent.trainID.in_(blacklist)))
                                .filter(TrainEvent.timestamp >= datetime(2011, 05, 31, 8, 0, 0))
                                .filter(TrainEvent.timestamp <= datetime(2011, 05, 31, 8, 30, 0))
                                .group_by(TrainEvent.trainID).all()]
@@ -83,69 +82,88 @@ tid = 1
 
 for train in trains:
     #print train
-    """badStops = ['204', '501', '201'] # 
     stations = session.query(distinct(TrainEvent.stopID)) \
                       .filter(TrainEvent.trainID==train) \
-                      #.filter(not_(TrainEvent.stopID.in_(['902']))) \
                       .order_by(TrainEvent.timestamp.asc()) \
-                      .all()"""
+                      .all()
+
+    def getArrivalTime(trainID, stopID):
+        try:
+            (t, ) = session.query(TrainEvent.timestamp) \
+                   .filter(TrainEvent.trainID==trainID) \
+                   .filter(TrainEvent.stopID==stopID) \
+                   .filter(TrainEvent.eventType=='ARRIVAL') \
+                   .one()
+            return t
+        except NoResultFound:
+            return None
+
+    def getDepartureTime(trainID, stopID):
+        try:
+            (t, ) = session.query(TrainEvent.timestamp) \
+                    .filter(TrainEvent.trainID==trainID) \
+                    .filter(TrainEvent.stopID==stopID) \
+                    .filter(TrainEvent.eventType=='DEPARTURE') \
+                    .one()
+            return t
+        except NoResultFound:
+            return None
+
+    def getRouteID(trainID):
+        (r, ) = session.query(TrainEvent.routeID) \
+                .filter(TrainEvent.trainID==trainID) \
+                .first()
+        return r
+
+    stationtimes = OrderedDict()
+
+    for station in stations:
+        (station,) = station
+        arrival = getArrivalTime(train, station)
+        departure = getDepartureTime(train, station)
+        stationtimes[station] = {'arrival': arrival, 'departure': departure}
+        
+    #Stops other than the first and last must have both an arrival and departure time.
+    for station in stationtimes.keys()[1:-1]:
+        if stationtimes[station]['arrival'] is None or stationtimes[station]['departure'] is None:
+            print "Removing station %s from train %s" %  (station, train)
+            del stationtimes[station]
 
     stations = []
     arrivals = []
     departures = []
-
-    events = session.query(TrainEvent) \
-                    .filter(TrainEvent.trainID==train) \
-                    .order_by(TrainEvent.timestamp.asc()) \
-                    .all()
-
-    if len(events) < 2:
+    
+    if len(stationtimes.keys()) < 2:
+        print "Train %s has fewer than 2 stops, ignoring" % train
         continue
 
+    firststop = stationtimes.keys()[0]
+    rest = stationtimes.keys()[1:-1]
+    laststop = stationtimes.keys()[-1]
 
-    firstEvent = events[0]
-    rest = events[1:]
+    #process first stop
 
+    if stationtimes[firststop]['departure'] is None:
+        print "Train %s did not have a departure time for first stop %s" % (train, firststop)
+        firststop = rest[0]
+        rest = rest[1:]
 
-    if events[1].eventType == 'DEPARTURE':
-        firstEvent = events[1]
-        rest = events[2:]
+    stations.append(firststop)
+    departures.append(stationtimes[firststop]['departure'])
 
-    #process first event
-    stations.append(firstEvent.stopID)
-    departures.append(firstEvent.timestamp)
+    for stopID in rest:
+        stations.append(stopID)
+        arrivals.append(stationtimes[stopID]['arrival'])
+        departures.append(stationtimes[stopID]['departure'])
 
-    expectedType = 'ARRIVAL'
-    trainDirection = firstEvent.directionID
+    #process last stop
+    stations.append(laststop)
+    arrivals.append(stationtimes[laststop]['arrival'])
 
-    for event in rest:
-        if event.eventType == expectedType:
-            if event.eventType == 'ARRIVAL':
-                stations.append(event.stopID)
-                arrivals.append(event.timestamp)
-                expectedType = 'DEPARTURE'
-            elif event.eventType == 'DEPARTURE':
-                departures.append(event.timestamp)
-                expectedType = 'ARRIVAL'
-        else:
-            if event.directionID != trainDirection:
-                continue
-            else:
-                print train
-                continue
-
-
-
-    """stations = [s for (s,) in stations]
-
-    if stations[0] in ('204', '501', '201'):
-        stations = stations[1:]"""
 
     arrivals = [int((a - datetime(*serviceDate.timetuple()[:-3])).total_seconds()) for a in arrivals]
 
     departures = [int((d - datetime(*serviceDate.timetuple()[:-3])).total_seconds()) for d in departures]
-
-    #assert (len(stations) - 1) == len(arrivals) == len(departures), (train, len(stations), len(arrivals), len(departures), stations, arrivals, departures, firstStop, lastStop)
 
     edges = [""]
     laststation = stations[0]
@@ -153,8 +171,7 @@ for train in trains:
         try:
             edges.append(pathbetween(laststation, station))
         except Exception, e:
-            print laststation, station
-            print train
+            print "Could not find a path between %s and %s for train %s" (laststation, station, train)
             raise
         laststation = station
 
@@ -162,7 +179,7 @@ for train in trains:
 
     trains_out.append({'id': str(tid),
                        'name': train,
-                       'type': firstEvent.routeID,
+                       'type': getRouteID(train),
                        'sts': stations,
                        'deps': departures,
                        'arrs': arrivals,

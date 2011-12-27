@@ -1,0 +1,13 @@
+Create the Fusion Tables:
+
+python createtables.py
+
+Full steps to regenerate the data:
+
+python import.py
+python fixup.py
+python generate.py
+python step2.py
+bash make.sh
+
+(this should probably all be condensed into one or two steps)
