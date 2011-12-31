@@ -2,9 +2,9 @@ define(['jquery',
         'async!http://maps.googleapis.com/maps/api/js' +
       '?v=3.7&sensor=false&libraries=geometry!callback',
         'timer', 'time_helpers', 'linesPool', 'stationsPool',
-        'imagesPool', 'vehicleFollower'],
+        'imagesPool', 'vehicleFollower', 'simulation_manager'],
 function(_jquery, _gmaps, timer, time_helpers, linesPool,
-    stationsPool, imagesPool, vehicleFollower) {
+    stationsPool, imagesPool, vehicleFollower, simulation_manager) {
 
   var vehicle_ib;
 
@@ -114,7 +114,6 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
       vehicle_ib.open(map, marker);
     });
     google.maps.event.addListener(marker, 'mouseout', function() {
-      console.log(vehicle_ib);
       vehicle_ib.set('vehicle_id', null);
       vehicle_ib.close();
     });

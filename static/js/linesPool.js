@@ -1,4 +1,4 @@
-define(['async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=false&libraries=geometry!callback'], function(_gmaps) {
+define(['async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=false&libraries=geometry!callback', 'edgeStore'], function(_gmaps, edgeStore) {
   // Routes manager.
   // Roles:
   // - keep a reference for the routes between stations
@@ -43,7 +43,7 @@ define(['async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=false&librari
     function routeAdd(a, b, edges) {
       var routePoints = [];
       $.each(edges, function(k, edgeID) {
-        var edge = simcity_topology_edges[Math.abs(edgeID)];
+        var edge = edgeStore[Math.abs(edgeID)];
 
         var points = google.maps.geometry.encoding.decodePath(edge);
         if (edgeID < 0) {

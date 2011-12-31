@@ -12,7 +12,7 @@ metadata.bind = engine
 
 trainevents = TrainEvent.__table__
 
-session.excute(trainevents.update().where(and_(trainevents.c.stopID==902, trainevents.c.routeID.in_(2,3))).values(stopID=127))
+session.execute(trainevents.update().where(and_(trainevents.c.stopID==902, trainevents.c.routeID.in_((2,3)))).values(stopID=127))
 session.execute(trainevents.update().where(trainevents.c.routeID=='NA').values(routeID='GS'))
 
 te = TrainEvent.__table__.alias('te1')

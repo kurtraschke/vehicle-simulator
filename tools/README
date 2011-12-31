@@ -1,13 +1,14 @@
-Create the Fusion Tables:
+Run this on google_transit.db:
 
-python createtables.py
+create index idx_shape_pt_loc on shapes(shape_pt_lat, shape_pt_lon);
+
+(otherwise, generate.py will not run in a reasonable period of time)
 
 Full steps to regenerate the data:
 
 python import.py
 python fixup.py
-python generate.py
-python step2.py
-bash make.sh
+python makeEverything.py user@example.com
 
-(this should probably all be condensed into one or two steps)
+Copy tools/out/ to api/
+Make the Fusion Tables world-readable on docs.google.com (would be nice if there were an API for this)
