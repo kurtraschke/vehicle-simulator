@@ -1,8 +1,8 @@
 define(['jquery',
         'async!http://maps.googleapis.com/maps/api/js' +
         '?v=3.7&sensor=false&libraries=geometry!callback',
-        'vehicle', 'vehicleFollower', 'linesPool'],
-function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool) {
+        'vehicle', 'vehicleFollower', 'linesPool', 'stationsPool'],
+function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool) {
 
   // Vehicle helpers
   // Roles:

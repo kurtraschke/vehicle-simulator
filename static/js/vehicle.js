@@ -76,7 +76,7 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
         return;
       }
 
-      $('a.vehicle_name').text(params.name);
+      $('#vehicle_info .vehicle_name').text(params.name);
 
       var hms = timer.getTime();
       if (has_multiple_days && (hms < params.deps[0])) {
@@ -107,7 +107,7 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
       vehicle_ib.close();
 
       var popup_div = $('#vehicle_popup');
-      $('span.vehicle_name').text(params.name);
+      $('.vehicle_name', popup_div).text(params.name);
       $('.status', popup_div).text(marker.get('status'));
 
       vehicle_ib.setContent($('#vehicle_popup_container').html());

@@ -8,9 +8,6 @@
         <link href="static/css/reset.css" rel="stylesheet" type="text/css" />
         <link href="static/css/style.css" rel="stylesheet" type="text/css" />
 
-        <!--<script src="static/js/edges_encoded-nyct.js"></script>-->
-        <!--<script src="static/js/infobox_packed.js"></script>-->
-       <!--<script src="static/js/map.js"></script>-->
         <script data-main="static/js/main" src="static/js/require.js"></script>
     </head>
     <body>
@@ -28,7 +25,7 @@
             </div>
             <div id="vehicle_info" class="hidden section" data-type="panel">
                 <div>
-                    <b>Vehicle:</b> <a class="vehicle_name" href="#" target="_blank"></a> <input type="button" class="panel_close" />
+                    <b>Vehicle:</b> <span class="vehicle_name"></span> <input type="button" class="panel_close" />
                 </div>
                 <div>
                     <input id="follow_trigger" type="button" value="Follow" data-value-toggle="STOP" />
@@ -57,7 +54,7 @@
                 <p class="status"></p>
             </div>
         </div>
-        <div id="vehicle_popup_container" class="hidden">
+        <!--<div id="vehicle_popup_container" class="hidden">
             <div id="vehicle_popup">
                 <p>
                     <strong class="name"></strong><br/>
@@ -65,6 +62,6 @@
                     <strong>Status:</strong> <span class="status"></span></span>
                 </p>
             </div>
-        </div>
+        </div>-->
     </body>
 </html>
