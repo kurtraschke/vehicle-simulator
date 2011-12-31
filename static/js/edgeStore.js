@@ -1,4 +1,4 @@
-define([], function(){
-       var edgeStore = {};
-         return edgeStore;
-       });
+define([], function() {
+  var edgeStore = {};
+  return edgeStore;
+});

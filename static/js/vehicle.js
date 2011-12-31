@@ -148,9 +148,9 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
               var speed = linesPool.lengthGet(station_a, station_b) * 0.001 * 3600 / (that.arrS[i] - that.depS[i]);
               that.marker.set('speed', parseInt(speed, 10));
 
-              that.marker.set('status', 'Travelling to ' + stationsPool.get(station_b) + 
+              that.marker.set('status', 'Travelling to ' + stationsPool.get(station_b) +
                               ' at ' + that.marker.get('speed') + ' km/h (' +
-                              Math.round(that.marker.get('speed') * 0.6213) + 
+                              Math.round(that.marker.get('speed') * 0.6213) +
                               ' MPH), arriving at ' + time_helpers.s2hm(that.arrS[i]));
             }
 

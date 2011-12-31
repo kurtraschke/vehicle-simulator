@@ -1,6 +1,6 @@
 define(['async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=false&libraries=geometry!callback',
-       'jquery'],
-       function(_google, _jquery) {
+  'jquery'],
+function(_google, _jquery) {
   var simulation_manager = (function() {
     var params = {
       //center_start: new google.maps.LatLng(40.75773, -73.985708),
@@ -39,7 +39,7 @@ define(['async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=false&librari
     function getParam(p) {
       return params[p];
     }
-                              
+
     function setParam(p, v) {
       params[p] = v;
     }
