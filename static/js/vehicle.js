@@ -198,6 +198,7 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
             map.panTo(pos);
             map.setZoom(simulation_manager.getParam('zoom_follow'));
             map.setMapTypeId('satellite');
+            map.setOptions({'draggable': false});
 
             map.bindTo('center', that.marker, 'position');
           }

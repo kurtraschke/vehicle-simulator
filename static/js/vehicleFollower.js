@@ -57,6 +57,7 @@ define(['jquery'], function(_jquery) {
         $('#vehicle_info').attr('data-vehicle-follow', 'no');
         toggler.removeClass('toggled');
         map.unbind('center');
+        map.setOptions({'draggable': true});
       } else {
         $('#vehicle_info').attr('data-vehicle-follow', 'yes-init');
         toggler.addClass('toggled');
