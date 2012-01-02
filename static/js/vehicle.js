@@ -13,7 +13,8 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
         vehicle_ib = new InfoBox({
           disableAutoPan: true,
           pixelOffset: new google.maps.Size(10, 10),
-          vehicle_id: 0
+          vehicle_id: 0,
+          closeBoxURL: ''
         });
         google.maps.event.addListener(vehicle_ib, 'closeclick', function() {
           linesPool.routeHighlightRemove();
@@ -30,6 +31,10 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
     this.depS = params.deps;
     this.arrS = params.arrs;
     this.multiple_days = has_multiple_days;
+    this.status = {'status': 'waiting'};
+    this.name = params.name;
+    this.direction = params.direction;
+    this.tracks = params.tracks;
 
     var html_rows = [];
     $.each(params.edges, function(index, edges) {
@@ -144,6 +149,8 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
           if (hms > that.depS[i]) {
             // Vehicle is in motion between two stations
             vehicle_found = true;
+            that.status = {'status': 'inmotion', 'stopID': station_b, 'when': that.arrS[i],
+              'track': that.tracks[i]};
             if (that.marker.get('speed') === 0) {
               var speed = linesPool.lengthGet(station_a, station_b) * 0.001 * 3600 / (that.arrS[i] - that.depS[i]);
               that.marker.set('speed', parseInt(speed, 10));
@@ -184,6 +191,10 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
             that.marker.set('status', 'Departing ' + stationsPool.get(station_a) +
                             ' at ' + time_helpers.s2hm(that.depS[i]));
             that.marker.set('speed', 0);
+            //FIXME: by default this means we get all of the departures waiting at a terminal.
+            //We can tell if we are at a terminal if i=0.  If so, set some kind of flag?
+            that.status = {'status': 'atstation', 'stopID': station_a, 'when': that.depS[i],
+              'track': that.tracks[i]};
 
             pos = stationsPool.location_get(station_a);
             that.marker.setPosition(pos);
@@ -208,6 +219,7 @@ function(_jquery, _gmaps, timer, time_helpers, linesPool,
 
       if (vehicle_found === false) {
         that.marker.setMap(null);
+        that.status = {'status': 'terminated'};
       }
     }
 

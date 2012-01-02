@@ -1,8 +1,8 @@
 define(['jquery',
         'async!http://maps.googleapis.com/maps/api/js' +
         '?v=3.7&sensor=false&libraries=geometry!callback',
-        'vehicle', 'vehicleFollower', 'linesPool', 'stationsPool'],
-function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool) {
+        'vehicle', 'vehicleFollower', 'linesPool', 'stationsPool', 'vehiclesPool'],
+function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool, vehiclesPool) {
 
   // Vehicle helpers
   // Roles:
@@ -48,7 +48,6 @@ function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool) {
 
     var vehicleIDs = [];
 
-
     return {
       get: function() {
         $.ajax({
@@ -60,6 +59,7 @@ function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool) {
               if (vehicleIDs.indexOf(data.id) !== -1) { return; }
 
               var v = new Vehicle(data);
+              vehiclesPool.push(v);
               v.render();
               vehicleIDs.push(data.id);
             });

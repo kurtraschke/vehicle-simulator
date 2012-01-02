@@ -33,12 +33,7 @@ define(['jquery', 'async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=fal
             { lightness: 70 }
           ]
         },{
-          featureType: 'transit.line',
-          stylers: [
-            { visibility: 'off' }
-          ]
-        },{
-          featureType: 'transit.station.bus',
+          featureType: 'transit',
           stylers: [
             { visibility: 'off' }
           ]
@@ -92,7 +87,8 @@ define(['jquery', 'async!http://maps.googleapis.com/maps/api/js?v=3.7&sensor=fal
       $('#geolocation_click').click(function() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
-            geocoding_handle({'latLng': new google.maps.LatLng(position.coords.latitude, position.coords.longitude)});
+            geocoding_handle({'latLng': new google.maps.LatLng(position.coords.latitude,
+                                                               position.coords.longitude)});
           });
         }
       });

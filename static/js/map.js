@@ -3,10 +3,10 @@ define(['jquery', 'jqueryui',
         'simulation_manager',
   'map_layers_add', 'stationsPool', 'imagesPool', 'linesPool',
   'time_helpers', 'timer', 'map_helpers',
-  'vehicle_helpers', 'edgeStore'],
-function(_jquery, _jqueryui, _gmaps, simulation_manager,
+  'vehicle_helpers', 'edgeStore', 'station'],
+function(jQuery, _jqueryui, _gmaps, simulation_manager,
     map_layers_add, stationsPool, imagesPool, linesPool,    
-    time_helpers, timer, map_helpers, vehicle_helpers, edgeStore) {
+    time_helpers, timer, map_helpers, vehicle_helpers, edgeStore, station) {
   /*global $, google, simcity_topology_edges, InfoBox */
 
   /*simulation_manager was here*/
@@ -29,8 +29,6 @@ function(_jquery, _jqueryui, _gmaps, simulation_manager,
     /*map_helpers was here*/
 
     /*vehicle_helpers was here*/
-
-
 
     // END HELPERS
 

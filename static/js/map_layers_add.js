@@ -1,10 +1,10 @@
 define(['simulation_manager'], function(simulation_manager) {
+  var map_layers = {};
   (function() {
     function map_layers_add() {
       var map = simulation_manager.getMap();
 
-      var layer = null;
-      layer = new google.maps.FusionTablesLayer({
+      map_layers['lines'] = new google.maps.FusionTablesLayer({
         query: {
           select: 'geometry',
           from: simulation_manager.getParam('ft_id_lines')
@@ -13,28 +13,29 @@ define(['simulation_manager'], function(simulation_manager) {
         map: map,
         styles: [
           {
-                    polylineOptions: {
+            polylineOptions: {
               strokeColor: '#FF0000',
               strokeWeight: 2
-                    }
+            }
           },{
-                    where: "type = 'tunnel'",
-                    polylineOptions: {
+            where: "type = 'tunnel'",
+            polylineOptions: {
               strokeColor: '#FAAFBE',
               strokeWeight: 1.5
-                    }
+            }
           }
         ]
       });
-      var stations_layer = new google.maps.FusionTablesLayer({
+      map_layers['stations'] = new google.maps.FusionTablesLayer({
         query: {
           select: 'geometry',
           from: simulation_manager.getParam('ft_id_stations')
         },
-        clickable: false,
+        clickable: true,
+        suppressInfoWindows: true,
         map: map
       });
-      layer = new google.maps.FusionTablesLayer({
+      map_layers['mask'] = new google.maps.FusionTablesLayer({
         query: {
           select: 'geometry',
           from: simulation_manager.getParam('ft_id_mask')
@@ -57,7 +58,7 @@ define(['simulation_manager'], function(simulation_manager) {
         }
 
         var zoom = map.getZoom();
-        toggleLayerVisibility(stations_layer, zoom >= 12);
+        toggleLayerVisibility(map_layers['stations'], zoom >= 12);
       }
 
       google.maps.event.addListener(map, 'idle', trigger_toggleLayerVisibility);
@@ -66,4 +67,6 @@ define(['simulation_manager'], function(simulation_manager) {
 
     simulation_manager.subscribe('map_init', map_layers_add);
   })();
+
+  return map_layers;
 });

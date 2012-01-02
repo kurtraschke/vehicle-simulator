@@ -18,6 +18,11 @@ body {
 .hidden {
     display: none;
 }
+
+div.infoBox img {
+    z-index: 1000;
+}
+
 /* END */
 
 /* SIMULATION PANEL */
@@ -127,6 +132,7 @@ input.toggled {
     
     background-color: #F2F2F2;
     border: 1px solid #111111;
+    opacity: 0.85;
 }
 
 #vehicle_popup p {
@@ -137,4 +143,34 @@ input.toggled {
 #vehicle_popup span.vehicle_name {
     font-weight: bold;
 }
+/* END */
+
+/* START station popup */
+#station_popup {
+    width: 300px;
+    padding: 5px 0px 5px 10px;
+    
+    background-color: #F2F2F2;
+    border: 1px solid #111111;
+    opacity: 0.85;
+}
+
+#station_popup p, #station_popup table {
+    font-size: 10px;
+    line-height: 12px;
+}
+
+#station_popup span.station_name {
+    font-weight: bold;
+}
+
+#station_popup thead td {
+    background-color: #DDD;
+}
+
+#station_popup tbody td {
+    border-top: 1px solid #DDD;
+    background-color: #FFFFFF;
+}
+
 /* END */
