@@ -33,7 +33,7 @@ config = createTables(user, ft_client)
 (trains_out, stations, paths) = generateTrains(session, schedule)
 (paths_out, stations_out, centroid) = processAndUpload(schedule, config, paths.values(), stations, ft_client)
 
-indent = 2
+indent = None
 
 with open("out/trains.json", "w") as trains_file:
     json.dump(trains_out, trains_file, indent=indent)
