@@ -11,10 +11,10 @@ class PathStore(object):
             return self.paths[(origin, destination)]['id']
         elif (destination, origin) in self.paths.keys():
             return '-' + self.paths[(destination, origin)]['id']
-
-        #FIXME: there are almost always multiple shapes; which one is right?
-        result = self.schedule.session.query("shape_id", "origin_seq", "dest_seq").from_statement("""
-        select sp1.shape_id as shape_id,
+        
+        points = self.schedule.session.query("shape_pt_lon", "shape_pt_lat").from_statement("""
+        select s.shape_pt_lat as shape_pt_lat, s.shape_pt_lon as shape_pt_lon
+        from shapes s, (select sp1.shape_id as shape_id,
         sp1.shape_pt_sequence as origin_seq,
         sp2.shape_pt_sequence as dest_seq
         from stops st1, stops st2, shapes sp1, shapes sp2
@@ -25,19 +25,12 @@ class PathStore(object):
         and st1.stop_lat = sp1.shape_pt_lat and st1.stop_lon = sp1.shape_pt_lon
         and st2.stop_lat = sp2.shape_pt_lat and st2.stop_lon = sp2.shape_pt_lon
         and sp2.shape_pt_sequence > sp1.shape_pt_sequence
-        """).params(origin_stop_id=origin, dest_stop_id=destination).first()
-
-        (shape_id, origin_seq, dest_seq) = result
-        
-        #The query above _could_ be stuffed into the query below, but I think it would just be frightening.
-        points = self.schedule.session.query("shape_pt_lon", "shape_pt_lat").from_statement("""
-        select shape_pt_lat, shape_pt_lon
-        from shapes
-        where shape_pt_sequence >= :origin_seq
-        and shape_pt_sequence <= :dest_seq
-        and shape_id = :shape_id
-        order by shape_pt_sequence asc
-        """).params(origin_seq=origin_seq, dest_seq=dest_seq, shape_id=shape_id).all()
+        limit 1) sp
+        where s.shape_pt_sequence >= sp.origin_seq
+        and s.shape_pt_sequence <= sp.dest_seq
+        and s.shape_id = sp.shape_id
+        order by s.shape_pt_sequence asc""").params(origin_stop_id=origin,
+                                                    dest_stop_id=destination).all()
 
         pathid = len(self.paths) + 1
         self.paths[(origin, destination)] = {'points': points, 'id': str(pathid)}
