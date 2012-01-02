@@ -64,6 +64,19 @@ def generateTrains(session, schedule):
                     .filter(TrainEvent.trainID==trainID) \
                     .first()
             return r
+        
+        def getDirection(trainID):
+            (r, ) = session.query(TrainEvent.directionID) \
+                    .filter(TrainEvent.trainID==trainID) \
+                    .first()
+            return r
+
+        def getTrack(trainID, stopID):
+            (r, ) = session.query(TrainEvent.trackID) \
+                    .filter(TrainEvent.trainID==trainID) \
+                    .filter(TrainEvent.stopID==stopID) \
+                    .first()
+            return r
 
         stationtimes = OrderedDict()
 
@@ -129,6 +142,8 @@ def generateTrains(session, schedule):
                            'name': train,
                            'type': getRouteID(train),
                            'sts': stations,
+                           'tracks': [getTrack(train, stopID) for stopID in stations],
+                           'direction': getDirection(train),
                            'deps': departures,
                            'arrs': arrivals,
                            'edges': edges})
