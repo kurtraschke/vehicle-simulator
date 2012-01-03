@@ -1,8 +1,10 @@
 define(['jquery',
         'async!http://maps.googleapis.com/maps/api/js' +
         '?v=3.7&sensor=false&libraries=geometry!callback',
-        'vehicle', 'vehicleFollower', 'linesPool', 'stationsPool', 'vehiclesPool'],
-function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool, vehiclesPool) {
+        'vehicle', 'vehicleFollower', 'linesPool', 'stationsPool', 'vehiclesPool',
+        'station', 'simulation_manager'],
+function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool, vehiclesPool,
+         station, simulation_manager) {
 
   // Vehicle helpers
   // Roles:
@@ -31,7 +33,8 @@ function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool, veh
       $(this).val(value_new);
     });
 
-    $('#vehicle_timetable tbody tr a').live('click', function() {
+    $('#vehicle_timetable tbody tr a').live('click', function(event) {
+      event.preventDefault();
       var station_location = stationsPool.location_get(
           $(this).attr('data-station-id'));
       if (parseInt(station_location.lng(), 10) === 0) { return; }
@@ -40,8 +43,7 @@ function(_jquery, _gmaps, Vehicle, vehicleFollower, linesPool, stationsPool, veh
       if (map.getZoom() < simulation_manager.getParam('zoom_station')) {
         map.setZoom(simulation_manager.getParam('zoom_station'));
       }
-
-      return false;
+      station.openPopup($(this).attr('data-station-id'));
     });
 
     /*Vehicle was here*/

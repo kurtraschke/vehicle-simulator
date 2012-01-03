@@ -1,7 +1,7 @@
 define(['jquery', 'async!http://maps.googleapis.com/maps/api/js' +
       '?v=3.7&sensor=false&libraries=geometry!callback',
-        'map_layers_add', 'simulation_manager', 'timer', 'vehiclesPool'],
-function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool) {
+        'map_layers_add', 'simulation_manager', 'timer', 'vehiclesPool', 'stationsPool'],
+function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool, stationsPool) {
 
 
   function vehiclesForStation(vehicles, stopID) {
@@ -57,8 +57,7 @@ function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool) {
       $.each(vehicle_info[1], function(idx, vehicle) {
         var seconds = vehicle.status.when - timer.getTime();
         tbody.append($('<tr></tr>').append(
-            $('<td></td>').append($('<a href=""></a>').append(
-            vehicle.name).click(clickVehicle(vehicle))),
+            $('<td></td>').append($('<a href=""></a>').append(vehicle.name).click(clickVehicle(vehicle))),
             $('<td></td>').append(vehicle.direction),
             $('<td></td>').append(vehicle.status.track),
             $('<td></td>').append('Departing in ' + seconds + ' seconds'))
@@ -68,21 +67,20 @@ function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool) {
       $.each(vehicle_info[0], function(idx, vehicle) {
         var seconds = vehicle.status.when - timer.getTime();
         tbody.append($('<tr></tr>').append(
-            $('<td></td>').append($('<a href=""></a>').append(
-            vehicle.name).click(clickVehicle(vehicle))),
+            $('<td></td>').append($('<a href=""></a>').append(vehicle.name).click(clickVehicle(vehicle))),
             $('<td></td>').append(vehicle.direction),
             $('<td></td>').append(vehicle.status.track),
             $('<td></td>').append('Arriving in ' + seconds + ' seconds'))
         );
       });
-
-
     }
 
-    var out = $('<div></div>').append(div).html();
-    return out;
+    var out = $('<div></div>').append(div);
+    return out.get(0);
   }
 
+
+  var setupPopup;
 
   simulation_manager.subscribe('map_init', function() {
 
@@ -102,18 +100,20 @@ function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool) {
         }
     );
 
+    setupPopup = function(station_id, station_name, latlng) {
+      station_ib.close();
+      station_ib.set('station_id', station_id);
+      station_ib.set('station_name', station_name);
+
+      station_ib.setContent(updateStationPopup(station_id, station_name));
+      station_ib.setPosition(latlng);
+      station_ib.open(map);
+    };
+
 
     google.maps.event.addListener(map_layers['stations'], 'click', function(event) {
       //if (station_ib.get('station_id') === event.row.id.value) { return; }
-      station_ib.set('station_id', event.row.id.value);
-      station_ib.set('station_name', event.row.name.value);
-
-      station_ib.close();
-
-      station_ib.setContent(updateStationPopup(event.row.id.value,
-          event.row.name.value));
-      station_ib.setPosition(event.latLng);
-      station_ib.open(map);
+      setupPopup(event.row.id.value, event.row.name.value, event.latLng);
     });
 
     setInterval(function() {
@@ -124,7 +124,12 @@ function(_jquery, _gmaps, map_layers, simulation_manager, timer, vehiclesPool) {
     }, 1000);
 
   });
-  return;
+
+
+  return {'openPopup': function(station_id) {
+    setupPopup(station_id, stationsPool.get(station_id),
+        stationsPool.location_get(station_id));
+  }};
 
 
 });
